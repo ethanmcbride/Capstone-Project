@@ -84,3 +84,20 @@ anes_2024_select_variables <- anes_2024 |>
          V241751h, # Attended public meeting to discuss problem(s)
          V241751j # Posted comments on social media about political/social issues
          )
+install.packages("ipumsr")
+library(ipumsr)
+
+ddi <- read_ipums_ddi("data/cps_00001.xml")
+data <- read_ipums_micro(ddi)
+
+library(tidyverse)
+
+data |>
+  group_by(YEAR) |>
+  summarize(count = n())
+
+data |>
+  filter(YEAR == 2020) |>
+  group_by(DISABWRK, VOWHYNOT) |>
+  summarize(count = n())
+  
