@@ -36,6 +36,7 @@ disability_data_w_columns <- anes_data_with_disability_status |>
          VCF0719, # Work for political campaigns
          VCF0720, # Display sticker or button in support of candidate
          VCF0721, # Donate money to party
+         VCF0722, # Contact public official 
          VCF0901b, # State postal abbreviation
          VCF9013, # Society ensures equal opportunity for success
          VCF9131, # Less vs more gov't
@@ -43,6 +44,25 @@ disability_data_w_columns <- anes_data_with_disability_status |>
          VCF9259, # How often follow political news
          VCF9250 # Belief vote makes a difference
          )
+
+ANES <- disability_data_w_columns |>
+  mutate(civic_engagement = rowSums(across(c(VCF0702, VCF0718, VCF0719, VCF0720, VCF0721, VCF0722)) == 2, 
+                                    na.rm = TRUE))
+
+test_data <- ANES |>
+  filter(VCF0004 >= 2000 & VCF0004 <= 2024)
+
+year_aov <- aov(civic_engagement ~ factor(VCF0004), data = test_data)
+TukeyHSD(year_aov)
+
+test_w_disability <- test_data |>
+  filter(disability_status == 1)
+
+year.lm <- lm(civic_engagement ~ factor(VCF0004), data = test_w_disability)
+summary(year.lm)
+
+disability.lm <- lm(civic_engagement ~ factor(VCF0004) * disability_status, data = test_data)
+summary(disability.lm)
 
 ### TIME SERIES DATA DOES NOT HAVE EMPLOYMENT FACTOR FOR 2020 OR 2024 ###
 
@@ -84,20 +104,4 @@ anes_2024_select_variables <- anes_2024 |>
          V241751h, # Attended public meeting to discuss problem(s)
          V241751j # Posted comments on social media about political/social issues
          )
-install.packages("ipumsr")
-library(ipumsr)
-
-ddi <- read_ipums_ddi("data/cps_00001.xml")
-data <- read_ipums_micro(ddi)
-
-library(tidyverse)
-
-data |>
-  group_by(YEAR) |>
-  summarize(count = n())
-
-data |>
-  filter(YEAR == 2020) |>
-  group_by(DISABWRK, VOWHYNOT) |>
-  summarize(count = n())
   
