@@ -24,6 +24,9 @@ anes_data_with_disability_status <- anes_data |>
     TRUE ~ 0
   ))
 
+### Think if it would be helpful to split disability status
+### Into different variables to observe
+
 # Relevant columns
 disability_data_w_columns <- anes_data_with_disability_status |>
   select(VCF0004, # Year of study
