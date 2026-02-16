@@ -107,4 +107,18 @@ anes_2024_select_variables <- anes_2024 |>
          V241751h, # Attended public meeting to discuss problem(s)
          V241751j # Posted comments on social media about political/social issues
          )
-  
+
+age <- anes_2024 |>
+  select(V241458x)
+
+library(readxl)  
+grants_data <- read_xlsx("data/Taggs PAVA data.xlsx",
+                         sheet = "Issued Year")
+
+grants_data_summary <- grants_data |>
+  group_by(`Funding FY`, State) |>
+  summarize(total_grant = sum(`Action Amount`), 
+            .groups = "drop")
+
+joined_data <- anes_data_with_disability_status |>
+  left_join(grants_data_summary, by = c(VCF0004 = "Funding FY", VCF0901b = "State"))
