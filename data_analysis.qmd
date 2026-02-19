@@ -1,0 +1,40 @@
+---
+title: "American Government Capstone \n Data Analysis"
+author: "Ethan McBride"
+format: html
+---
+
+## Loading the cleaned data
+
+```{r}
+library(tidyverse)
+library(readxl)
+
+data <- read_csv("data/ANES_grants_data.csv")
+
+```
+
+## Preliminary models
+
+```{r}
+first.lm <- lm(voted ~ disabled*after_hava + external_efficacy_index + central + south + west + age, data = data)
+summary(first.lm)
+```
+
+```{r}
+data_subset <- data |>
+  filter(!is.na(total_grant))
+
+grant_model.lm <- lm(voted ~ disabled + disabled*external_efficacy_index + 
+                       total_grant*central + total_grant*south + total_grant*west, data = 
+                       data_subset)
+summary(grant_model.lm)
+```
+
+```{r}
+data_subset_adj <- data_subset |>
+  mutate(years_since_HAVA = year - 2002)
+
+lm <- lm(voted ~ disabled*years_since_HAVA + disabled*external_efficacy_index +
+           total_grant + central + south + west + )
+```
